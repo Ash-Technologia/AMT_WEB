@@ -1,0 +1,152 @@
+[
+  {
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1200",
+      "publicId": "blog_1"
+    },
+    "_id": "69a2ba13a50c9f5e05ee8a3b",
+    "title": "The Advanced Science Behind Grounding Therapy",
+    "slug": "the-advanced-science-behind-grounding-therapy",
+    "excerpt": "Discover how connecting with the Earth’s natural electrical charge can reduce inflammation, improve sleep, and neutralize free radicals.",
+    "author": {
+      "_id": "69a2ba13a50c9f5e05ee8a23",
+      "name": "Aayush Singhavi",
+      "avatar": "https://res.cloudinary.com/diegbwzlg/image/upload/v1772272210/amt/avatars/avatar_69a2ba13a50c9f5e05ee8a23.jpg"
+    },
+    "tags": [
+      "Grounding",
+      "Wellness",
+      "Science"
+    ],
+    "isPublished": true,
+    "views": 3250,
+    "__v": 0,
+    "createdAt": "2026-02-28T09:49:07.889Z",
+    "updatedAt": "2026-02-28T09:49:07.889Z"
+  },
+  {
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=1200",
+      "publicId": "blog_2"
+    },
+    "_id": "69a2ba13a50c9f5e05ee8a3c",
+    "title": "5 Ways Hydrotherapy Can Accelerate Muscle Recovery",
+    "slug": "5-ways-hydrotherapy-can-accelerate-muscle-recovery",
+    "excerpt": "Learn the ancient secrets of water healing and how our new GRAD Tub technology maximizes these benefits for athletes and rehabilitation.",
+    "author": {
+      "_id": "69a2ba13a50c9f5e05ee8a23",
+      "name": "Aayush Singhavi",
+      "avatar": "https://res.cloudinary.com/diegbwzlg/image/upload/v1772272210/amt/avatars/avatar_69a2ba13a50c9f5e05ee8a23.jpg"
+    },
+    "tags": [
+      "Hydrotherapy",
+      "Recovery",
+      "Fitness"
+    ],
+    "isPublished": true,
+    "views": 2840,
+    "__v": 0,
+    "createdAt": "2026-02-28T09:49:07.889Z",
+    "updatedAt": "2026-02-28T09:49:07.889Z"
+  },
+  {
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1505330622279-bf7d7bc91561?q=80&w=1200",
+      "publicId": "blog_3"
+    },
+    "_id": "69a2ba13a50c9f5e05ee8a3d",
+    "title": "Understanding Zero Volt Therapy in a Hyper-Connected World",
+    "slug": "understanding-zero-volt-therapy",
+    "excerpt": "Are modern electronics making you sick? What you need to know about static buildup, EMFs, and neutralizing your body voltage.",
+    "author": {
+      "_id": "69a2ba13a50c9f5e05ee8a23",
+      "name": "Aayush Singhavi",
+      "avatar": "https://res.cloudinary.com/diegbwzlg/image/upload/v1772272210/amt/avatars/avatar_69a2ba13a50c9f5e05ee8a23.jpg"
+    },
+    "tags": [
+      "Zero Volt",
+      "EMF",
+      "Health"
+    ],
+    "isPublished": true,
+    "views": 4100,
+    "__v": 0,
+    "createdAt": "2026-02-28T09:49:07.889Z",
+    "updatedAt": "2026-02-28T09:49:07.889Z"
+  },
+  {
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?q=80&w=1200",
+      "publicId": "blog_4"
+    },
+    "_id": "69a2ba13a50c9f5e05ee8a3e",
+    "title": "The Vital Role of Structured Water in Cellular Hydration",
+    "slug": "vital-role-of-structured-water-in-cellular-hydration",
+    "excerpt": "Not all water hydrates equally. Uncover the science between bulk water and crystalline structured water for optimal cellular health.",
+    "author": {
+      "_id": "69a2ba13a50c9f5e05ee8a23",
+      "name": "Aayush Singhavi",
+      "avatar": "https://res.cloudinary.com/diegbwzlg/image/upload/v1772272210/amt/avatars/avatar_69a2ba13a50c9f5e05ee8a23.jpg"
+    },
+    "tags": [
+      "Hydration",
+      "Water",
+      "Bio-hacks"
+    ],
+    "isPublished": true,
+    "views": 1850,
+    "__v": 0,
+    "createdAt": "2026-02-28T09:49:07.889Z",
+    "updatedAt": "2026-02-28T09:49:07.889Z"
+  },
+  {
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200",
+      "publicId": "blog_5"
+    },
+    "_id": "69a2ba13a50c9f5e05ee8a3f",
+    "title": "Rehabilitating Calf Muscles After Sporting Injuries",
+    "slug": "rehabilitating-calf-muscles-after-sporting-injuries",
+    "excerpt": "A comprehensive guide on rebuilding strength and elasticity in the lower leg using targeted pressure technology.",
+    "author": {
+      "_id": "69a2ba13a50c9f5e05ee8a23",
+      "name": "Aayush Singhavi",
+      "avatar": "https://res.cloudinary.com/diegbwzlg/image/upload/v1772272210/amt/avatars/avatar_69a2ba13a50c9f5e05ee8a23.jpg"
+    },
+    "tags": [
+      "Rehabilitation",
+      "Muscles",
+      "Sports"
+    ],
+    "isPublished": true,
+    "views": 2200,
+    "__v": 0,
+    "createdAt": "2026-02-28T09:49:07.889Z",
+    "updatedAt": "2026-02-28T09:49:07.889Z"
+  },
+  {
+    "coverImage": {
+      "url": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200",
+      "publicId": "blog_6"
+    },
+    "_id": "69a2ba13a50c9f5e05ee8a40",
+    "title": "Hot Water VASO Stimulation: A Heart-Healthy Practice",
+    "slug": "hot-water-vaso-stimulation-heart-healthy-practice",
+    "excerpt": "How passive heating through precision hydro-technology can lower blood pressure and improve arterial flexibility.",
+    "author": {
+      "_id": "69a2ba13a50c9f5e05ee8a23",
+      "name": "Aayush Singhavi",
+      "avatar": "https://res.cloudinary.com/diegbwzlg/image/upload/v1772272210/amt/avatars/avatar_69a2ba13a50c9f5e05ee8a23.jpg"
+    },
+    "tags": [
+      "Cardiovascular",
+      "Heat Therapy",
+      "Healing"
+    ],
+    "isPublished": true,
+    "views": 3100,
+    "__v": 0,
+    "createdAt": "2026-02-28T09:49:07.889Z",
+    "updatedAt": "2026-02-28T09:49:07.889Z"
+  }
+]
