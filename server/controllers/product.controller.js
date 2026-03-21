@@ -71,6 +71,23 @@ exports.getProduct = async (req, res) => {
 // ─── CREATE PRODUCT (Admin) ───────────────────────────────────────────────────
 exports.createProduct = async (req, res) => {
     try {
+        let newImages = [];
+        if (req.files) {
+            if (req.files.mainImage) {
+                newImages.push({ url: req.files.mainImage[0].path, publicId: req.files.mainImage[0].filename });
+            }
+            if (req.files.supportingImages) {
+                req.files.supportingImages.forEach(file => {
+                    newImages.push({ url: file.path, publicId: file.filename });
+                });
+            }
+        }
+        
+        // Use the uploaded images, otherwise fallback to empty array
+        if (newImages.length > 0) {
+            req.body.images = newImages;
+        }
+
         const product = await Product.create(req.body);
         res.status(201).json({ success: true, product });
     } catch (err) {
@@ -81,6 +98,32 @@ exports.createProduct = async (req, res) => {
 // ─── UPDATE PRODUCT (Admin) ───────────────────────────────────────────────────
 exports.updateProduct = async (req, res) => {
     try {
+        let finalImages = [];
+        if (req.body.existingImages) {
+            try {
+                finalImages = JSON.parse(req.body.existingImages);
+            } catch (e) {
+                console.error('Error parsing existing images:', e);
+            }
+        }
+
+        if (req.files) {
+            if (req.files.mainImage) {
+                finalImages.unshift({ url: req.files.mainImage[0].path, publicId: req.files.mainImage[0].filename });
+            }
+            if (req.files.supportingImages) {
+                req.files.supportingImages.forEach(file => {
+                    finalImages.push({ url: file.path, publicId: file.filename });
+                });
+            }
+        }
+        
+        // Only override images if we have parsed existing ones or new ones have been uploaded
+        // This prevents wiping out images if frontend didn't send existingImages for some reason
+        if (req.body.existingImages || req.files) {
+            req.body.images = finalImages;
+        }
+
         const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         if (!product) return res.status(404).json({ success: false, message: 'Product not found.' });
         res.json({ success: true, product });

@@ -161,7 +161,7 @@ const Blog = () => {
                                         <img
                                             src={blog.coverImage?.url || blog.coverImage}
                                             alt={blog.title}
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'transform 0.5s' }}
                                             onMouseOver={e => e.target.style.transform = 'scale(1.05)'}
                                             onMouseOut={e => e.target.style.transform = 'scale(1)'}
                                         />

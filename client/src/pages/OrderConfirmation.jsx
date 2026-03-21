@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { FiPackage, FiShoppingBag, FiHome, FiMapPin, FiClock, FiCheck } from 'react-icons/fi';
+import { FiPackage, FiShoppingBag, FiHome, FiMapPin, FiPhoneCall, FiCheck } from 'react-icons/fi';
 import API from '../services/api';
+
+const AMT_CONTACT = '9822843015';
 
 const statusSteps = ['Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered'];
 const statusColors = {
@@ -42,7 +44,7 @@ const OrderConfirmation = () => {
 
     return (
         <>
-            <Helmet><title>Order Confirmed — AMT</title></Helmet>
+            <Helmet><title>Booking Confirmed — AMT</title></Helmet>
             <div className="container" style={{ paddingTop: 'var(--space-2xl)', paddingBottom: 'var(--space-3xl)', maxWidth: 720, position: 'relative', overflow: 'hidden' }}>
                 {/* Decorative Elements */}
                 <AyurvedaLeaf style={{ position: 'absolute', top: '5%', left: '-20px', color: 'var(--primary-light)', width: 140, height: 140, transform: 'rotate(-30deg)' }} />
@@ -63,11 +65,49 @@ const OrderConfirmation = () => {
                         🎉
                     </motion.div>
                     <h1 className="gradient-text" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', marginBottom: 'var(--space-sm)' }}>
-                        Order Confirmed!
+                        Booking Confirmed!
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', maxWidth: 480, margin: '0 auto' }}>
-                        Thank you! Your order has been placed successfully. We'll send you a confirmation email shortly.
+                        Your order has been placed successfully — no payment required now. We'll reach out to confirm.
                     </p>
+                </motion.div>
+
+                {/* ── Payment Call-to-action Banner ── */}
+                <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.15 }}
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(201,168,76,0.12), rgba(82,183,136,0.08))',
+                        border: '1px solid rgba(201,168,76,0.35)',
+                        borderRadius: 'var(--radius-lg)',
+                        padding: 'var(--space-lg)',
+                        marginBottom: 'var(--space-lg)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-md)',
+                    }}
+                >
+                    <div style={{ fontSize: '2.2rem', flexShrink: 0 }}>📞</div>
+                    <div>
+                        <h4 style={{ color: 'var(--gold)', marginBottom: 4 }}>Complete Your Payment</h4>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                            Call or WhatsApp us at{' '}
+                            <a href={`tel:${AMT_CONTACT}`} style={{ color: 'var(--primary-light)', fontWeight: 700, textDecoration: 'none' }}>
+                                {AMT_CONTACT}
+                            </a>{' '}
+                            to complete payment for your booking.
+                        </p>
+                        <a
+                            href={`https://wa.me/91${AMT_CONTACT}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-primary"
+                            style={{ marginTop: 12, display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '0.875rem' }}
+                        >
+                            <FiPhoneCall /> WhatsApp {AMT_CONTACT}
+                        </a>
+                    </div>
                 </motion.div>
 
                 {/* ── Order Summary Card ── */}
@@ -75,12 +115,12 @@ const OrderConfirmation = () => {
                     className="glass-card"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
+                    transition={{ delay: 0.25 }}
                     style={{ padding: 'var(--space-xl)', marginBottom: 'var(--space-lg)' }}
                 >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-lg)', flexWrap: 'wrap', gap: 'var(--space-sm)' }}>
                         <div>
-                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Order ID</p>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Booking ID</p>
                             <p style={{ fontWeight: 700, fontFamily: 'monospace', fontSize: '1.05rem' }}>#{order._id?.slice(-10).toUpperCase()}</p>
                         </div>
                         <div style={{ textAlign: 'right' }}>
@@ -121,12 +161,14 @@ const OrderConfirmation = () => {
                     {/* Summary row */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
                         <div style={{ background: 'var(--surface)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
-                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 4 }}>Total Amount</p>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 4 }}>Order Total</p>
                             <p style={{ fontWeight: 700, fontSize: '1.3rem', color: 'var(--primary-light)' }}>₹{(order.totalAmount || order.total)?.toLocaleString('en-IN')}</p>
                         </div>
                         <div style={{ background: 'var(--surface)', borderRadius: 'var(--radius-md)', padding: 'var(--space-md)' }}>
-                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 4 }}><FiClock style={{ verticalAlign: 'middle', marginRight: 4 }} />Estimated Delivery</p>
-                            <p style={{ fontWeight: 600 }}>5–7 Business Days</p>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 4 }}>Payment Status</p>
+                            <p style={{ fontWeight: 600, color: order.paymentStatus === 'paid' ? 'var(--success)' : 'var(--warning)' }}>
+                                {order.paymentStatus === 'paid' ? '✓ Paid' : '⏳ Pending Payment'}
+                            </p>
                         </div>
                     </div>
                 </motion.div>
@@ -141,15 +183,14 @@ const OrderConfirmation = () => {
                         style={{ padding: 'var(--space-xl)', marginBottom: 'var(--space-lg)' }}
                     >
                         <h3 style={{ marginBottom: 'var(--space-lg)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <FiPackage /> Order Items ({order.items.length})
+                            <FiPackage /> Items Booked ({order.items.length})
                         </h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
                             {order.items.map((item, i) => (
                                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', padding: 'var(--space-sm)', background: 'var(--surface)', borderRadius: 'var(--radius-md)' }}>
-                                    {item.image && (
-                                        <img src={item.image} alt={item.name} style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
-                                    )}
-                                    {!item.image && (
+                                    {item.image ? (
+                                        <img src={item.image} alt={item.name} style={{ width: 56, height: 56, objectFit: 'contain', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+                                    ) : (
                                         <div style={{ width: 56, height: 56, background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                             <FiPackage style={{ color: 'var(--text-muted)' }} />
                                         </div>
@@ -166,7 +207,7 @@ const OrderConfirmation = () => {
                 )}
 
                 {/* ── Shipping Address ── */}
-                {order.shippingAddress && (
+                {order.shippingAddress?.fullName && (
                     <motion.div
                         className="glass-card"
                         initial={{ y: 20, opacity: 0 }}
@@ -175,13 +216,12 @@ const OrderConfirmation = () => {
                         style={{ padding: 'var(--space-xl)', marginBottom: 'var(--space-lg)' }}
                     >
                         <h3 style={{ marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <FiMapPin /> Shipping Address
+                            <FiMapPin /> Contact Details
                         </h3>
                         <div style={{ color: 'var(--text-secondary)', lineHeight: 1.8 }}>
-                            <p style={{ fontWeight: 600 }}>{order.shippingAddress.name || order.shippingAddress.fullName}</p>
-                            <p>{order.shippingAddress.addressLine1 || order.shippingAddress.street}</p>
-                            {order.shippingAddress.addressLine2 && <p>{order.shippingAddress.addressLine2}</p>}
-                            <p>{order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.pincode || order.shippingAddress.zip}</p>
+                            <p style={{ fontWeight: 600 }}>{order.shippingAddress.fullName}</p>
+                            {order.shippingAddress.phone && <p>📞 {order.shippingAddress.phone}</p>}
+                            {order.shippingAddress.city && <p>{order.shippingAddress.city}{order.shippingAddress.state ? `, ${order.shippingAddress.state}` : ''}</p>}
                         </div>
                     </motion.div>
                 )}
@@ -219,7 +259,7 @@ const OrderConfirmation = () => {
                     style={{ display: 'flex', gap: 'var(--space-md)', flexWrap: 'wrap' }}
                 >
                     <Link to="/orders" className="btn btn-primary" style={{ flex: 1, justifyContent: 'center', minWidth: 160 }}>
-                        <FiShoppingBag /> View My Orders
+                        <FiShoppingBag /> My Bookings
                     </Link>
                     <Link to="/products" className="btn btn-glass" style={{ flex: 1, justifyContent: 'center', minWidth: 160 }}>
                         <FiHome /> Continue Shopping

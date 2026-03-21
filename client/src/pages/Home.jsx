@@ -425,6 +425,17 @@ const Home = () => {
                             >
                                 Subscribe on YouTube
                             </a>
+                            <div style={{ marginTop: 'var(--space-md)' }}>
+                                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '4px' }}>Video Link:</span>
+                                <a 
+                                    href={config.homepageVideoUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    style={{ color: 'var(--primary-light)', fontSize: '0.9rem', wordBreak: 'break-all', textDecoration: 'underline' }}
+                                >
+                                    {config.homepageVideoUrl}
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

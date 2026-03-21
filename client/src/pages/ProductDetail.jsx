@@ -89,7 +89,7 @@ const ProductDetail = () => {
                             <img
                                 src={product.images?.[activeImg]?.url || 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800'}
                                 alt={product.name}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                             />
                             {product.images?.length > 1 && (
                                 <>
@@ -117,7 +117,7 @@ const ProductDetail = () => {
                                             cursor: 'pointer', background: 'none', padding: 0,
                                         }}
                                     >
-                                        <img src={img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <img src={img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                     </button>
                                 ))}
                             </div>
@@ -152,6 +152,11 @@ const ProductDetail = () => {
                                 </>
                             )}
                         </div>
+                        {product.requiresExtraDeliveryCharge && (
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '-8px', fontStyle: 'italic' }}>
+                                * Extra delivery charge required (no amount) to be paid at time of delivery
+                            </div>
+                        )}
 
                         {/* Stock */}
                         <div>

@@ -11,7 +11,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Products = lazy(() => import('./pages/Products'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Cart = lazy(() => import('./pages/Cart'));
-const Checkout = lazy(() => import('./pages/Checkout'));
+
 const OrderConfirmation = lazy(() => import('./pages/OrderConfirmation'));
 const OrderHistory = lazy(() => import('./pages/OrderHistory'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
@@ -91,7 +91,7 @@ const App = () => {
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/shipping-policy" element={<ShippingPolicy />} />
 
-              <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+
               <Route path="/order-confirmation/:id" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
               <Route path="/orders" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
               <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />

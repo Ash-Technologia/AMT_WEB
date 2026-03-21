@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import API from '../../services/api';
 import toast from 'react-hot-toast';
 
@@ -8,6 +8,7 @@ const AdminCoupons = () => {
     const [coupons, setCoupons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [editCoupon, setEditCoupon] = useState(null);
     const [form, setForm] = useState({ code: '', discountType: 'percentage', discountValue: '', minOrderAmount: '', maxUses: '', expiresAt: '' });
     const [submitting, setSubmitting] = useState(false);
 
@@ -18,14 +19,38 @@ const AdminCoupons = () => {
 
     useEffect(() => { fetchCoupons(); }, []);
 
+    const openForm = (coupon = null) => {
+        if (coupon) {
+            setForm({
+                code: coupon.code,
+                discountType: coupon.discountType,
+                discountValue: coupon.discountValue,
+                minOrderAmount: coupon.minOrderAmount || '',
+                maxUses: coupon.maxUses || '',
+                expiresAt: coupon.expiresAt ? new Date(coupon.expiresAt).toISOString().split('T')[0] : ''
+            });
+            setEditCoupon(coupon);
+        } else {
+            setForm({ code: '', discountType: 'percentage', discountValue: '', minOrderAmount: '', maxUses: '', expiresAt: '' });
+            setEditCoupon(null);
+        }
+        setShowForm(true);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             setSubmitting(true);
-            await API.post('/coupons', form);
-            toast.success('Coupon created!');
+            if (editCoupon) {
+                await API.put(`/coupons/${editCoupon._id}`, form);
+                toast.success('Coupon updated!');
+            } else {
+                await API.post('/coupons', form);
+                toast.success('Coupon created!');
+            }
             setShowForm(false);
             setForm({ code: '', discountType: 'percentage', discountValue: '', minOrderAmount: '', maxUses: '', expiresAt: '' });
+            setEditCoupon(null);
             fetchCoupons();
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to create coupon');
@@ -51,12 +76,12 @@ const AdminCoupons = () => {
             <div>
                 <div className="admin-page-header">
                     <h1 className="admin-page-title">Coupons</h1>
-                    <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}><FiPlus /> Add Coupon</button>
+                    <button className="btn btn-primary" onClick={() => openForm()}><FiPlus /> Add Coupon</button>
                 </div>
 
                 {showForm && (
                     <div className="glass-card" style={{ padding: 'var(--space-xl)', marginBottom: 'var(--space-xl)' }}>
-                        <h3 style={{ marginBottom: 'var(--space-lg)' }}>New Coupon</h3>
+                        <h3 style={{ marginBottom: 'var(--space-lg)' }}>{editCoupon ? 'Edit Coupon' : 'New Coupon'}</h3>
                         <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
                             <div className="form-group">
                                 <label className="form-label">Code *</label>
@@ -86,7 +111,7 @@ const AdminCoupons = () => {
                                 <input type="date" value={form.expiresAt} onChange={e => setForm(f => ({ ...f, expiresAt: e.target.value }))} className="form-input" />
                             </div>
                             <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 'var(--space-md)' }}>
-                                <button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? 'Creating...' : 'Create Coupon'}</button>
+                                <button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? 'Saving...' : (editCoupon ? 'Update Coupon' : 'Create Coupon')}</button>
                                 <button type="button" className="btn btn-glass" onClick={() => setShowForm(false)}>Cancel</button>
                             </div>
                         </form>
@@ -122,7 +147,10 @@ const AdminCoupons = () => {
                                         </span>
                                     </td>
                                     <td>
-                                        <button onClick={() => handleDelete(coupon._id)} className="icon-btn" style={{ color: 'var(--error)' }}><FiTrash2 /></button>
+                                        <div className="flex gap-sm">
+                                            <button onClick={() => openForm(coupon)} className="icon-btn" style={{ color: 'var(--primary-light)' }}><FiEdit2 /></button>
+                                            <button onClick={() => handleDelete(coupon._id)} className="icon-btn" style={{ color: 'var(--error)' }}><FiTrash2 /></button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

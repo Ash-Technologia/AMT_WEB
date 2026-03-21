@@ -16,7 +16,7 @@ const PrivacyPolicy = () => (
                 </section>
                 <section>
                     <h2 style={{ color: 'var(--text-primary)', marginBottom: 'var(--space-sm)' }}>Data Security</h2>
-                    <p>We implement appropriate security measures to protect your personal information. All payment transactions are processed through Razorpay's secure payment gateway.</p>
+                    <p>We implement appropriate security measures to protect your personal information. Payments are collected offline via phone or WhatsApp after booking confirmation.</p>
                 </section>
                 <section>
                     <h2 style={{ color: 'var(--text-primary)', marginBottom: 'var(--space-sm)' }}>Contact Us</h2>

@@ -10,8 +10,10 @@ const AdminProducts = () => {
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editProduct, setEditProduct] = useState(null);
-    const [form, setForm] = useState({ name: '', description: '', price: '', discountPrice: '', stock: '', category: '', tags: '', howToUse: '', instructions: '', videoUrl: '' });
-    const [imageFiles, setImageFiles] = useState([]);
+    const [form, setForm] = useState({ name: '', description: '', price: '', discountPrice: '', stock: '', category: '', tags: '', howToUse: '', instructions: '', videoUrl: '', requiresExtraDeliveryCharge: false });
+    const [mainImageFile, setMainImageFile] = useState(null);
+    const [supportingImageFiles, setSupportingImageFiles] = useState([]);
+    const [existingImages, setExistingImages] = useState([]);
     const [submitting, setSubmitting] = useState(false);
     const [selectedIds, setSelectedIds] = useState([]);
 
@@ -24,20 +26,23 @@ const AdminProducts = () => {
 
     const fetchProducts = () => {
         setLoading(true);
-        API.get('/products?limit=100').then(res => setProducts(res.data.products || [])).catch(console.error).finally(() => setLoading(false));
+        API.get('/products/admin/all').then(res => setProducts(res.data.products || [])).catch(console.error).finally(() => setLoading(false));
     };
 
     useEffect(() => { fetchProducts(); }, []);
 
     const openForm = (product = null) => {
         if (product) {
-            setForm({ name: product.name, description: product.description, price: product.price, discountPrice: product.discountPrice || '', stock: product.stock, category: product.category || '', tags: product.tags?.join(', ') || '', howToUse: product.howToUse || '', instructions: product.instructions || '', videoUrl: product.videoUrl || '' });
+            setForm({ name: product.name, description: product.description, price: product.price, discountPrice: product.discountPrice || '', stock: product.stock, category: product.category || '', tags: product.tags?.join(', ') || '', howToUse: product.howToUse || '', instructions: product.instructions || '', videoUrl: product.videoUrl || '', requiresExtraDeliveryCharge: product.requiresExtraDeliveryCharge || false });
+            setExistingImages(product.images || []);
             setEditProduct(product);
         } else {
-            setForm({ name: '', description: '', price: '', discountPrice: '', stock: '', category: '', tags: '', howToUse: '', instructions: '', videoUrl: '' });
+            setForm({ name: '', description: '', price: '', discountPrice: '', stock: '', category: '', tags: '', howToUse: '', instructions: '', videoUrl: '', requiresExtraDeliveryCharge: false });
+            setExistingImages([]);
             setEditProduct(null);
         }
-        setImageFiles([]);
+        setMainImageFile(null);
+        setSupportingImageFiles([]);
         setShowForm(true);
     };
 
@@ -47,7 +52,9 @@ const AdminProducts = () => {
             setSubmitting(true);
             const formData = new FormData();
             Object.entries(form).forEach(([k, v]) => formData.append(k, v));
-            imageFiles.forEach(f => formData.append('images', f));
+            formData.append('existingImages', JSON.stringify(existingImages));
+            if (mainImageFile) formData.append('mainImage', mainImageFile);
+            supportingImageFiles.forEach(f => formData.append('supportingImages', f));
 
             if (editProduct) {
                 await API.put(`/products/${editProduct._id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
@@ -144,11 +151,36 @@ const AdminProducts = () => {
                                     <label className="form-label">Instructions / Warnings</label>
                                     <textarea value={form.instructions} onChange={e => setForm(f => ({ ...f, instructions: e.target.value }))} className="form-input" rows={2} />
                                 </div>
+                                {form.name.toLowerCase().includes('grad tub') && (
+                                    <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                                        <input type="checkbox" id="gradTubDelivery" checked={form.requiresExtraDeliveryCharge} onChange={e => setForm(f => ({...f, requiresExtraDeliveryCharge: e.target.checked}))} style={{ accentColor: 'var(--primary)', width: 16, height: 16 }} />
+                                        <label htmlFor="gradTubDelivery" className="form-label" style={{ marginBottom: 0, cursor: 'pointer' }}>Requires Extra Delivery Charge (Grad Tub Only)</label>
+                                    </div>
+                                )}
                                 <div className="form-group">
-                                    <label className="form-label">Product Images</label>
-                                    <input type="file" accept="image/*" multiple onChange={e => setImageFiles(Array.from(e.target.files))} className="form-input" />
-                                    {imageFiles.length > 0 && <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{imageFiles.length} file(s) selected</p>}
+                                    <label className="form-label">Main Image</label>
+                                    <input type="file" accept="image/*" onChange={e => setMainImageFile(e.target.files[0])} className="form-input" />
+                                    {mainImageFile && <p style={{ fontSize: '0.8rem', color: 'var(--success)' }}>1 file selected</p>}
                                 </div>
+                                <div className="form-group">
+                                    <label className="form-label">Supporting Images</label>
+                                    <input type="file" accept="image/*" multiple onChange={e => setSupportingImageFiles(Array.from(e.target.files))} className="form-input" />
+                                    {supportingImageFiles.length > 0 && <p style={{ fontSize: '0.8rem', color: 'var(--success)' }}>{supportingImageFiles.length} file(s) selected</p>}
+                                </div>
+                                {existingImages.length > 0 && (
+                                    <div className="form-group">
+                                        <label className="form-label">Existing Images (Click ✕ to remove)</label>
+                                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                            {existingImages.map((img, idx) => (
+                                                <div key={idx} style={{ position: 'relative' }}>
+                                                    <img src={img.url} alt="" style={{ width: 60, height: 60, objectFit: 'contain', borderRadius: '4px' }} />
+                                                    {idx === 0 && <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: '10px', textAlign: 'center' }}>Main</span>}
+                                                    <button type="button" onClick={() => setExistingImages(prev => prev.filter((_, i) => i !== idx))} style={{ position: 'absolute', top: -5, right: -5, background: 'red', color: 'white', borderRadius: '50%', width: 20, height: 20, fontSize: '12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="flex gap-md">
                                     <button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? 'Saving...' : 'Save Product'}</button>
                                     <button type="button" className="btn btn-glass" onClick={() => setShowForm(false)}>Cancel</button>
@@ -194,7 +226,7 @@ const AdminProducts = () => {
                                         />
                                     </td>
                                     <td>
-                                        <img src={product.images?.[0]?.url} alt={product.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8 }} />
+                                        <img src={product.images?.[0]?.url} alt={product.name} style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 8 }} />
                                     </td>
                                     <td style={{ fontWeight: 500, color: 'var(--text-primary)', maxWidth: 200 }}>{product.name}</td>
                                     <td>

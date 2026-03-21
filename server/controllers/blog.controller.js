@@ -49,6 +49,9 @@ exports.adminGetBlogs = async (req, res) => {
 // ─── ADMIN: CREATE BLOG ───────────────────────────────────────────────────────
 exports.createBlog = async (req, res) => {
     try {
+        if (req.file) {
+            req.body.coverImage = { url: req.file.path, publicId: req.file.filename };
+        }
         const blog = await Blog.create({ ...req.body, author: req.user._id });
         res.status(201).json({ success: true, blog });
     } catch (err) {
@@ -59,6 +62,11 @@ exports.createBlog = async (req, res) => {
 // ─── ADMIN: UPDATE BLOG ───────────────────────────────────────────────────────
 exports.updateBlog = async (req, res) => {
     try {
+        if (req.file) {
+            req.body.coverImage = { url: req.file.path, publicId: req.file.filename };
+        } else if (req.body.removeCover === 'true') {
+            req.body.coverImage = null; // or empty obj
+        }
         const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!blog) return res.status(404).json({ success: false, message: 'Blog not found.' });
         res.json({ success: true, blog });

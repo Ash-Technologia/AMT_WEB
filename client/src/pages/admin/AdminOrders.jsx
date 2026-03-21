@@ -5,15 +5,24 @@ import toast from 'react-hot-toast';
 import { useSocket } from '../../context/SocketContext';
 
 const STATUS_OPTIONS = ['Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
+const PAYMENT_STATUS_OPTIONS = ['pending', 'paid', 'refunded'];
+
 const STATUS_COLORS = {
     Placed: 'var(--warning)', Confirmed: 'var(--info)', Shipped: 'var(--primary-light)',
     'Out for Delivery': 'var(--primary)', Delivered: 'var(--success)', Cancelled: 'var(--error)',
 };
 
+const PAYMENT_COLORS = {
+    pending: 'var(--warning)',
+    paid: 'var(--success)',
+    failed: 'var(--error)',
+    refunded: 'var(--info)',
+};
+
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [trackingModal, setTrackingModal] = useState(null); // { orderId, carrier, trackingId, trackingUrl }
+    const [trackingModal, setTrackingModal] = useState(null);
     const { socket } = useSocket();
 
     useEffect(() => {
@@ -23,15 +32,14 @@ const AdminOrders = () => {
             .finally(() => setLoading(false));
     }, []);
 
-    // ── Real-time: new order notification ────────────────────────────────────
+    // ── Real-time: new booking notification ──────────────────────────────────
     useEffect(() => {
         if (!socket) return;
         const handler = ({ orderId, totalAmount, userName }) => {
             toast.success(
-                `🛒 New order from ${userName}!\n₹${totalAmount?.toLocaleString('en-IN')}`,
+                `📦 New booking from ${userName}!\n₹${totalAmount?.toLocaleString('en-IN')}`,
                 { duration: 6000, icon: '🛍️' }
             );
-            // Refresh order list
             API.get('/orders/admin/all').then(res => setOrders(res.data.orders || [])).catch(() => { });
         };
         socket.on('order:new', handler);
@@ -42,9 +50,19 @@ const AdminOrders = () => {
         try {
             await API.put(`/orders/${id}/status`, { orderStatus });
             setOrders(prev => prev.map(o => o._id === id ? { ...o, orderStatus } : o));
-            toast.success('Order status updated');
+            toast.success('Booking status updated');
         } catch {
             toast.error('Failed to update status');
+        }
+    };
+
+    const updatePaymentStatus = async (id, paymentStatus) => {
+        try {
+            await API.put(`/orders/${id}/status`, { paymentStatus });
+            setOrders(prev => prev.map(o => o._id === id ? { ...o, paymentStatus } : o));
+            toast.success('Payment status updated');
+        } catch {
+            toast.error('Failed to update payment status');
         }
     };
 
@@ -66,10 +84,10 @@ const AdminOrders = () => {
 
     return (
         <>
-            <Helmet><title>Orders — AMT Admin</title></Helmet>
+            <Helmet><title>Bookings — AMT Admin</title></Helmet>
             <div>
                 <div className="admin-page-header">
-                    <h1 className="admin-page-title">Orders</h1>
+                    <h1 className="admin-page-title">Bookings</h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                         {orders.length} total · <span style={{ color: 'var(--primary-light)' }}>⚡ Live updates enabled</span>
                     </p>
@@ -78,19 +96,22 @@ const AdminOrders = () => {
                     <table className="admin-table">
                         <thead>
                             <tr>
-                                <th>Order ID</th>
+                                <th>Booking ID</th>
                                 <th>Customer</th>
+                                <th>Contact</th>
                                 <th>Items</th>
                                 <th>Total</th>
-                                <th>Status</th>
+                                <th>Order Status</th>
+                                <th>Payment</th>
                                 <th>Date</th>
-                                <th>Update</th>
+                                <th>Update Status</th>
+                                <th>Mark Paid</th>
                                 <th>Tracking</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={8} style={{ textAlign: 'center', padding: 'var(--space-xl)' }}>Loading...</td></tr>
+                                <tr><td colSpan={11} style={{ textAlign: 'center', padding: 'var(--space-xl)' }}>Loading...</td></tr>
                             ) : orders.map(order => (
                                 <tr key={order._id}>
                                     <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>#{order._id.slice(-8)}</td>
@@ -98,11 +119,26 @@ const AdminOrders = () => {
                                         <div style={{ fontWeight: 500 }}>{order.user?.name || 'Guest'}</div>
                                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{order.user?.email}</div>
                                     </td>
+                                    <td style={{ fontSize: '0.8rem' }}>
+                                        {order.shippingAddress?.phone && (
+                                            <a href={`tel:${order.shippingAddress.phone}`} style={{ color: 'var(--primary-light)' }}>
+                                                {order.shippingAddress.phone}
+                                            </a>
+                                        )}
+                                        {order.shippingAddress?.city && (
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{order.shippingAddress.city}</div>
+                                        )}
+                                    </td>
                                     <td>{order.items?.length || 0} item(s)</td>
                                     <td style={{ fontWeight: 600 }}>₹{order.totalAmount?.toLocaleString('en-IN')}</td>
                                     <td>
                                         <span style={{ color: STATUS_COLORS[order.orderStatus] || 'var(--text-muted)', fontWeight: 600 }}>
                                             ● {order.orderStatus || 'Placed'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span style={{ color: PAYMENT_COLORS[order.paymentStatus] || 'var(--text-muted)', fontWeight: 600 }}>
+                                            {order.paymentStatus === 'paid' ? '✓ Paid' : order.paymentStatus === 'pending' ? '⏳ Pending' : order.paymentStatus}
                                         </span>
                                     </td>
                                     <td style={{ fontSize: '0.8rem' }}>{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
@@ -114,6 +150,16 @@ const AdminOrders = () => {
                                             style={{ padding: '6px 12px', fontSize: '0.85rem', width: 'auto', background: 'var(--bg-tertiary)', border: '1px solid var(--border)' }}
                                         >
                                             {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select
+                                            value={order.paymentStatus || 'pending'}
+                                            onChange={e => updatePaymentStatus(order._id, e.target.value)}
+                                            className="form-input"
+                                            style={{ padding: '6px 12px', fontSize: '0.85rem', width: 'auto', background: 'var(--bg-tertiary)', border: '1px solid var(--border)' }}
+                                        >
+                                            {PAYMENT_STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                                         </select>
                                     </td>
                                     <td>

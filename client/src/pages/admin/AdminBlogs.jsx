@@ -11,6 +11,7 @@ const AdminBlogs = () => {
     const [editBlog, setEditBlog] = useState(null);
     const [form, setForm] = useState({ title: '', content: '', excerpt: '', tags: '', isPublished: true });
     const [coverFile, setCoverFile] = useState(null);
+    const [existingCover, setExistingCover] = useState(null);
     const [submitting, setSubmitting] = useState(false);
 
     const fetchBlogs = () => {
@@ -23,9 +24,11 @@ const AdminBlogs = () => {
     const openForm = (blog = null) => {
         if (blog) {
             setForm({ title: blog.title, content: blog.content, excerpt: blog.excerpt || '', tags: blog.tags?.join(', ') || '', isPublished: blog.isPublished });
+            setExistingCover(blog.coverImage || null);
             setEditBlog(blog);
         } else {
             setForm({ title: '', content: '', excerpt: '', tags: '', isPublished: true });
+            setExistingCover(null);
             setEditBlog(null);
         }
         setCoverFile(null);
@@ -39,6 +42,7 @@ const AdminBlogs = () => {
             const formData = new FormData();
             Object.entries(form).forEach(([k, v]) => formData.append(k, v));
             if (coverFile) formData.append('coverImage', coverFile);
+            if (!existingCover && editBlog && editBlog.coverImage) formData.append('removeCover', 'true');
 
             if (editBlog) {
                 await API.put(`/blogs/${editBlog._id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
@@ -94,6 +98,16 @@ const AdminBlogs = () => {
                             <div className="form-group">
                                 <label className="form-label">Cover Image</label>
                                 <input type="file" accept="image/*" onChange={e => setCoverFile(e.target.files[0])} className="form-input" />
+                                {existingCover && !coverFile && (
+                                    <div style={{ position: 'relative', marginTop: '10px', display: 'inline-block' }}>
+                                        <label className="form-label" style={{ fontSize: '0.8rem' }}>Existing Cover:</label>
+                                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                                            <img src={existingCover.url} alt="Cover" style={{ width: 120, height: 75, objectFit: 'contain', borderRadius: '4px', border: '1px solid var(--border)' }} />
+                                            <button type="button" onClick={() => setExistingCover(null)} style={{ position: 'absolute', top: -5, right: -5, background: 'red', color: 'white', borderRadius: '50%', width: 20, height: 20, fontSize: '12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Remove existing cover">✕</button>
+                                        </div>
+                                    </div>
+                                )}
+                                {coverFile && <p style={{ fontSize: '0.8rem', color: 'var(--success)', marginTop: '4px' }}>1 new file selected</p>}
                             </div>
                             <div className="flex gap-sm" style={{ alignItems: 'center' }}>
                                 <input type="checkbox" id="isPublished" checked={form.isPublished} onChange={e => setForm(f => ({ ...f, isPublished: e.target.checked }))} />

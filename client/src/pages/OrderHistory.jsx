@@ -39,7 +39,7 @@ const OrderCard = ({ order }) => {
                     {order.items?.slice(0, 3).map((item, i) => (
                         <div key={i} style={{ width: 48, height: 48, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)', background: 'var(--surface)', flexShrink: 0 }}>
                             {item.image
-                                ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                 : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FiPackage style={{ color: 'var(--text-muted)', fontSize: 18 }} /></div>
                             }
                         </div>
@@ -134,7 +134,7 @@ const OrderCard = ({ order }) => {
                                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', background: 'var(--surface)', padding: '10px 12px', borderRadius: 'var(--radius-md)' }}>
                                         <div style={{ width: 44, height: 44, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: 'var(--bg-tertiary)', border: '1px solid var(--border)' }}>
                                             {item.image
-                                                ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                                 : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FiPackage style={{ color: 'var(--text-muted)' }} /></div>
                                             }
                                         </div>

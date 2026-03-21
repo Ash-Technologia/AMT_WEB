@@ -1,5 +1,3 @@
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
 const Order = require('../models/Order.model');
 const User = require('../models/User.model');
 const Coupon = require('../models/Coupon.model');
@@ -7,74 +5,19 @@ const Settings = require('../models/Settings.model');
 const { sendEmail, emailTemplates } = require('../services/email.service');
 const { getIO } = require('../socket');
 
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
-// ─── CREATE RAZORPAY ORDER ────────────────────────────────────────────────────
-exports.createRazorpayOrder = async (req, res) => {
-    try {
-        const { amount } = req.body; // amount in paise
-        const options = {
-            amount: Math.round(amount * 100),
-            currency: 'INR',
-            receipt: `receipt_${Date.now()}`,
-        };
-        const razorpayOrder = await razorpay.orders.create(options);
-        res.json({ success: true, order: razorpayOrder });
-    } catch (err) {
-        console.error('Razorpay Create Order Error:', err);
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
-
-// ─── VERIFY RAZORPAY PAYMENT ──────────────────────────────────────────────────
-exports.verifyPayment = async (req, res) => {
-    try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-        const body = razorpay_order_id + '|' + razorpay_payment_id;
-        const expectedSignature = crypto
-            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-            .update(body)
-            .digest('hex');
-
-        if (expectedSignature !== razorpay_signature)
-            return res.status(400).json({ success: false, message: 'Payment verification failed.' });
-
-        res.json({ success: true, message: 'Payment verified.' });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
-
-// ─── CREATE ORDER ─────────────────────────────────────────────────────────────
+// ─── CREATE BOOKING ───────────────────────────────────────────────────────────
 exports.createOrder = async (req, res) => {
     try {
-        const { items, shippingAddress, paymentMethod, razorpayOrderId, razorpayPaymentId, couponCode, notes } = req.body;
+        const { items, shippingAddress, notes } = req.body;
 
         // Calculate subtotal
         const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
         // Get shipping charge from settings
         const shippingSetting = await Settings.findOne({ key: 'shippingCharge' });
-        const shippingCharge = shippingSetting ? shippingSetting.value : 60;
+        const shippingCharge = shippingSetting ? shippingSetting.value : 0;
 
-        // Apply coupon
-        let couponApplied = { code: '', discount: 0 };
-        if (couponCode) {
-            const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true });
-            if (coupon && coupon.expiryDate > new Date() && coupon.usedCount < coupon.maxUses && subtotal >= coupon.minOrderAmount) {
-                const discount = coupon.discountType === 'percent'
-                    ? Math.round((subtotal * coupon.discountValue) / 100)
-                    : coupon.discountValue;
-                couponApplied = { code: coupon.code, discount };
-                coupon.usedCount += 1;
-                await coupon.save();
-            }
-        }
-
-        const totalAmount = subtotal + shippingCharge - couponApplied.discount;
+        const totalAmount = subtotal + shippingCharge;
 
         // Delivery estimate from settings
         const deliverySetting = await Settings.findOne({ key: 'deliveryEstimate' });
@@ -84,13 +27,11 @@ exports.createOrder = async (req, res) => {
             user: req.user._id,
             items,
             shippingAddress,
-            paymentMethod,
-            paymentStatus: paymentMethod === 'razorpay' ? 'paid' : 'pending',
-            razorpayOrderId: razorpayOrderId || '',
-            razorpayPaymentId: razorpayPaymentId || '',
+            paymentMethod: 'booking',
+            paymentStatus: 'pending',
             subtotal,
             shippingCharge,
-            couponApplied,
+            couponApplied: { code: '', discount: 0 },
             totalAmount,
             deliveryEstimate,
             notes: notes || '',
@@ -100,22 +41,26 @@ exports.createOrder = async (req, res) => {
         await User.findByIdAndUpdate(req.user._id, { cart: [] });
 
         // Send confirmation email to User
-        await sendEmail(
-            req.user.email,
-            `Order Confirmed — #${order._id}`,
-            emailTemplates.orderConfirmation(req.user.name, order._id, items, totalAmount)
-        );
+        try {
+            await sendEmail(
+                req.user.email,
+                `Booking Confirmed — #${order._id}`,
+                emailTemplates.orderConfirmation(req.user.name, order._id, items, totalAmount)
+            );
+        } catch (_) { /* Email not critical */ }
 
         // Send notification email to Admin
-        await sendEmail(
-            process.env.ADMIN_EMAIL,
-            `New Order Received — #${order._id}`,
-            emailTemplates.adminOrderNotification(req.user.name, order._id, items, totalAmount)
-        );
+        try {
+            await sendEmail(
+                process.env.ADMIN_EMAIL,
+                `New Booking Received — #${order._id}`,
+                emailTemplates.adminOrderNotification(req.user.name, order._id, items, totalAmount)
+            );
+        } catch (_) { /* Email not critical */ }
 
         res.status(201).json({ success: true, order });
 
-        // ── Real-time: Notify admin of new order ──
+        // ── Real-time: Notify admin of new booking ──
         try {
             getIO().to('admin').emit('order:new', {
                 orderId: order._id,
@@ -172,10 +117,16 @@ exports.adminGetOrders = async (req, res) => {
 // ─── ADMIN: UPDATE ORDER STATUS ───────────────────────────────────────────────
 exports.updateOrderStatus = async (req, res) => {
     try {
-        const { orderStatus, trackingInfo, deliveryEstimate } = req.body;
+        const { orderStatus, paymentStatus, trackingInfo, deliveryEstimate } = req.body;
+        const update = {
+            ...(orderStatus && { orderStatus }),
+            ...(paymentStatus && { paymentStatus }),
+            ...(trackingInfo && { trackingInfo }),
+            ...(deliveryEstimate && { deliveryEstimate }),
+        };
         const order = await Order.findByIdAndUpdate(
             req.params.id,
-            { orderStatus, ...(trackingInfo && { trackingInfo }), ...(deliveryEstimate && { deliveryEstimate }) },
+            update,
             { new: true }
         ).populate('user', 'name email');
 
@@ -221,4 +172,3 @@ exports.trackOrder = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
-

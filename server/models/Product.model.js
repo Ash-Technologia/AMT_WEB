@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema(
         stock: { type: Number, required: true, default: 0, min: 0 },
         images: [{ url: String, publicId: String }],
         isVisible: { type: Boolean, default: true },
+        requiresExtraDeliveryCharge: { type: Boolean, default: false },
         ratings: {
             average: { type: Number, default: 0 },
             count: { type: Number, default: 0 },
