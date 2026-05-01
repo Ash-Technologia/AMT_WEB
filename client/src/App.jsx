@@ -25,6 +25,7 @@ const Register = lazy(() => import('./pages/Register'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const Quiz = lazy(() => import('./pages/Quiz'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const ShippingPolicy = lazy(() => import('./pages/ShippingPolicy'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -40,6 +41,7 @@ const AdminCoupons = lazy(() => import('./pages/admin/AdminCoupons'));
 const AdminQueries = lazy(() => import('./pages/admin/AdminQueries'));
 const AdminNewsletter = lazy(() => import('./pages/admin/AdminNewsletter'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminReviews = lazy(() => import('./pages/admin/AdminReviews'));
 
 // ─── Route Guards ─────────────────────────────────────────────────────────────
 const ProtectedRoute = ({ children }) => {
@@ -80,6 +82,7 @@ const App = () => {
             {/* Maintenance Protected Routes (Home, Products, etc.) */}
             <Route element={<MaintenanceGuard><Outlet /></MaintenanceGuard>}>
               <Route path="/" element={<Home />} />
+              <Route path="/quiz" element={<Quiz />} />
               <Route path="/products" element={<Products />} />
               <Route path="/products/:slug" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
@@ -112,6 +115,7 @@ const App = () => {
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="customers" element={<AdminCustomers />} />
+            <Route path="reviews" element={<AdminReviews />} />
             <Route path="blogs" element={<AdminBlogs />} />
             <Route path="coupons" element={<AdminCoupons />} />
             <Route path="queries" element={<AdminQueries />} />

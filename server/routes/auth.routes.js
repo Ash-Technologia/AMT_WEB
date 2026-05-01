@@ -8,14 +8,20 @@ const {
     getAddresses, addAddress, deleteAddress, setDefaultAddress
 } = require('../controllers/auth.controller');
 const { protect } = require('../middleware/auth.middleware');
+const {
+    validateRegister,
+    validateLogin,
+    validateForgotPassword,
+    validateResetPassword,
+} = require('../middleware/validate.middleware');
 
-router.post('/register', register);
+router.post('/register', validateRegister, register);
 router.post('/verify-otp', verifyOTP);
 router.post('/resend-otp', resendOTP);
-router.post('/login', login);
+router.post('/login', validateLogin, login);
 router.post('/google', googleLogin);
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password/:token', resetPassword);
+router.post('/forgot-password', validateForgotPassword, forgotPassword);
+router.post('/reset-password/:token', validateResetPassword, resetPassword);
 router.get('/me', protect, getMe);
 router.put('/profile', protect, updateProfile);
 router.post('/upload-avatar', protect, uploadAvatar);

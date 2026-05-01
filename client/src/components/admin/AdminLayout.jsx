@@ -13,6 +13,7 @@ const navItems = [
     { path: '/admin/products', label: 'Products', icon: <FiPackage /> },
     { path: '/admin/orders', label: 'Orders', icon: <FiShoppingBag /> },
     { path: '/admin/customers', label: 'Customers', icon: <FiUsers /> },
+    { path: '/admin/reviews', label: 'Reviews', icon: <FiMessageSquare /> },
     { path: '/admin/blogs', label: 'Blogs', icon: <FiFileText /> },
     { path: '/admin/coupons', label: 'Coupons', icon: <FiTag /> },
     { path: '/admin/queries', label: 'Queries', icon: <FiMessageSquare /> },

@@ -60,7 +60,8 @@ exports.adminGetReviews = async (req, res) => {
 // ─── ADMIN: APPROVE REVIEW ────────────────────────────────────────────────────
 exports.approveReview = async (req, res) => {
     try {
-        const review = await Review.findByIdAndUpdate(req.params.id, { isApproved: true }, { new: true });
+        const { isApproved } = req.body;
+        const review = await Review.findByIdAndUpdate(req.params.id, { isApproved: isApproved !== undefined ? isApproved : true }, { new: true });
         if (!review) return res.status(404).json({ success: false, message: 'Review not found.' });
         await updateProductRatings(review.product);
         res.json({ success: true, review });

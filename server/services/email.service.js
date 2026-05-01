@@ -156,6 +156,53 @@ const emailTemplates = {
       </div>
     </div>
   `,
+  orderShipped: (name, orderId, items, total, trackingInfo) => `
+    <div style="font-family:Inter,sans-serif;max-width:600px;margin:auto;background:#0A0F0D;color:#F0F4F1;border-radius:16px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#1e3a5f,#2563eb);padding:40px;text-align:center;">
+        <h1 style="color:#93c5fd;font-size:28px;margin:0;">AMT</h1>
+        <p style="color:#bfdbfe;margin:8px 0 0;">Your Order is on the Way! 🚚</p>
+      </div>
+      <div style="padding:40px;">
+        <h2 style="color:#60a5fa;">Great news, ${name}!</h2>
+        <p style="color:#A8C5B5;">Your order <strong style="color:#C9A84C;">#${orderId}</strong> has been shipped.</p>
+        ${trackingInfo && trackingInfo.trackingId ? `<div style="background:#111;border-radius:12px;padding:20px;margin:20px 0;">
+          <p style="color:#9ca3af;margin:0 0 8px;">Carrier: <strong style="color:#F0F4F1;">${trackingInfo.carrier || 'N/A'}</strong></p>
+          <p style="color:#9ca3af;margin:0;">Tracking ID: <strong style="color:#93c5fd;">${trackingInfo.trackingId}</strong></p>
+          ${trackingInfo.trackingUrl ? `<a href="${trackingInfo.trackingUrl}" style="display:inline-block;margin-top:16px;background:#2563eb;color:#fff;padding:10px 24px;border-radius:50px;text-decoration:none;font-weight:600;">Track Shipment</a>` : ''}
+        </div>` : ''}
+        <a href="${process.env.CLIENT_URL}/orders" style="display:inline-block;background:linear-gradient(135deg,#2D6A4F,#52B788);color:#fff;padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:600;">View Order</a>
+      </div>
+    </div>
+  `,
+
+  orderDelivered: (name, orderId) => `
+    <div style="font-family:Inter,sans-serif;max-width:600px;margin:auto;background:#0A0F0D;color:#F0F4F1;border-radius:16px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#14532d,#22c55e);padding:40px;text-align:center;">
+        <h1 style="color:#fff;font-size:28px;margin:0;">AMT</h1>
+        <p style="color:#bbf7d0;margin:8px 0 0;">Order Delivered ✅</p>
+      </div>
+      <div style="padding:40px;">
+        <h2 style="color:#4ade80;">Delivered, ${name}!</h2>
+        <p style="color:#A8C5B5;">Your order <strong style="color:#C9A84C;">#${orderId}</strong> has been delivered. We hope you love your products!</p>
+        <a href="${process.env.CLIENT_URL}/products" style="display:inline-block;background:linear-gradient(135deg,#2D6A4F,#52B788);color:#fff;padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:600;margin-top:20px;">Shop Again</a>
+      </div>
+    </div>
+  `,
+
+  orderCancelled: (name, orderId) => `
+    <div style="font-family:Inter,sans-serif;max-width:600px;margin:auto;background:#0A0F0D;color:#F0F4F1;border-radius:16px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#7f1d1d,#ef4444);padding:40px;text-align:center;">
+        <h1 style="color:#fff;font-size:28px;margin:0;">AMT</h1>
+        <p style="color:#fecaca;margin:8px 0 0;">Order Cancelled</p>
+      </div>
+      <div style="padding:40px;">
+        <h2 style="color:#f87171;">Order Cancelled, ${name}</h2>
+        <p style="color:#A8C5B5;">Your order <strong style="color:#C9A84C;">#${orderId}</strong> has been cancelled successfully. Stock has been restored.</p>
+        <a href="${process.env.CLIENT_URL}/products" style="display:inline-block;background:linear-gradient(135deg,#2D6A4F,#52B788);color:#fff;padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:600;margin-top:20px;">Shop Again</a>
+      </div>
+    </div>
+  `,
+
   adminOrderNotification: (customerName, orderId, items, totalAmount) => `
     <div style="font-family:Inter,sans-serif;max-width:600px;margin:auto;background:#0A0F0D;color:#F0F4F1;border-radius:16px;overflow:hidden;">
       <div style="background:linear-gradient(135deg,#2D6A4F,#1B4332);padding:32px;text-align:center;">

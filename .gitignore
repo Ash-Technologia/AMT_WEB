@@ -1,0 +1,41 @@
+# ─── Node / npm ───────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Environment Files (CRITICAL — never commit secrets) ──────────────────────
+.env
+.env.local
+.env.production
+.env.development
+.env.staging
+*.env
+
+# ─── Build Output ─────────────────────────────────────────────────────────────
+dist/
+build/
+.expo/
+.expo-shared/
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── OS Files ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDE / Editor ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── Debug / Temp Files ───────────────────────────────────────────────────────
+blogs_debug.json
+srv.csv
+srv_records.txt
+txt.csv
+txt.txt

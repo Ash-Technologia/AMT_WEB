@@ -34,6 +34,15 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+// ── Feature #19: Stricter rate limiter for OTP/auth sensitive endpoints ──
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 5,
+  message: { success: false, message: 'Too many attempts. Please wait 10 minutes before trying again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // ─── Body Parsing ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -44,7 +53,31 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
+// ── Feature #20: Input sanitization — strip HTML tags from string fields ──
+const sanitizeInput = (req, res, next) => {
+  const stripHtml = (val) => {
+    if (typeof val !== 'string') return val;
+    return val.replace(/<[^>]*>/g, '').trim();
+  };
+  const sanitize = (obj) => {
+    if (!obj || typeof obj !== 'object') return;
+    Object.keys(obj).forEach(key => {
+      if (typeof obj[key] === 'string') obj[key] = stripHtml(obj[key]);
+      else if (typeof obj[key] === 'object') sanitize(obj[key]);
+    });
+  };
+  sanitize(req.body);
+  next();
+};
+app.use(sanitizeInput);
+
 // ─── Routes ────────────────────────────────────────────────────────────────────
+// Apply strict OTP rate limiter to sensitive auth endpoints
+app.use('/api/auth/register', otpLimiter);
+app.use('/api/auth/resend-otp', otpLimiter);
+app.use('/api/auth/forgot-password', otpLimiter);
+app.use('/api/auth/send-phone-otp', otpLimiter);
+
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/products', require('./routes/product.routes'));
 app.use('/api/reviews', require('./routes/review.routes'));
@@ -101,7 +134,13 @@ app.use('/{*path}', (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, {
+    // ── Production-grade connection options ──────────────────────────────────
+    maxPoolSize: 10,          // Maintain up to 10 socket connections
+    serverSelectionTimeoutMS: 5000,  // Keep trying to send operations for 5s
+    socketTimeoutMS: 45000,  // Close sockets after 45s of inactivity
+    connectTimeoutMS: 10000, // Give up initial connection after 10s
+  })
   .then(() => {
     const dbName = mongoose.connection.name;
     // ── Initialize Socket.io ──────────────────────────────────────────────────

@@ -229,8 +229,8 @@ const Home = () => {
                             <MagneticButton to="/products" className="btn btn-primary btn-lg hero-cta-primary">
                                 Explore Products <FiArrowRight />
                             </MagneticButton>
-                            <MagneticButton to="/about" className="btn btn-glass btn-lg hero-cta-glass">
-                                Our Story
+                            <MagneticButton to="/quiz" className="btn btn-glass btn-lg hero-cta-glass">
+                                Take Wellness Quiz
                             </MagneticButton>
                         </div>
 
