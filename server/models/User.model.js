@@ -4,10 +4,10 @@ const bcrypt = require('bcryptjs');
 const addressSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
     phone: { type: String, required: true },
-    street: { type: String, required: true },
+    street: { type: String, default: '' },  // Optional — mobile app may not collect this
     city: { type: String, required: true },
     state: { type: String, required: true },
-    pincode: { type: String, required: true },
+    pincode: { type: String, default: '' }, // Optional — mobile app may not collect this
     isDefault: { type: Boolean, default: false },
 });
 

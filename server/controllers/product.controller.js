@@ -197,7 +197,7 @@ exports.getSuggestions = async (req, res) => {
         if (!query) return res.json({ success: true, suggestions: [] });
 
         const suggestions = await Product.find({
-            isVisible: true,
+            isVisible: { $ne: false }, // Matches explicit true AND missing field (legacy docs)
             $or: [
                 { name: { $regex: query, $options: 'i' } },
                 { tags: { $regex: query, $options: 'i' } }

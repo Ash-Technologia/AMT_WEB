@@ -19,7 +19,9 @@ const { initSocket } = require('./socket');
 // ─── Security Middleware ──────────────────────────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors({
-  origin: true, // Allow all origins (essential for React Native LAN testing)
+  origin: process.env.NODE_ENV === 'production'
+    ? [process.env.CLIENT_URL, /\.vercel\.app$/, /\.netlify\.app$/].filter(Boolean)
+    : true, // Allow all in development (essential for React Native LAN testing)
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
 }));

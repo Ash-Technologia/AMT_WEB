@@ -111,36 +111,6 @@ exports.login = async (req, res) => {
     }
 };
 
-// ─── GOOGLE LOGIN ─────────────────────────────────────────────────────────────
-exports.googleLogin = async (req, res) => {
-    try {
-        const { credential } = req.body;
-        const ticket = await googleClient.verifyIdToken({
-            idToken: credential,
-            audience: process.env.GOOGLE_CLIENT_ID,
-        });
-        const { name, email, picture, sub: googleId } = ticket.getPayload();
-
-        let user = await User.findOne({ email });
-        if (!user) {
-            user = await User.create({ name, email, googleId, avatar: picture, isVerified: true });
-            await sendEmail(email, 'Welcome to AMT!', emailTemplates.welcome(name));
-        } else if (!user.googleId) {
-            user.googleId = googleId;
-            user.avatar = picture || user.avatar;
-            await user.save();
-        }
-
-        const token = generateToken(user._id);
-        res.json({
-            success: true,
-            token,
-            user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
-        });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
 
 // ─── FORGOT PASSWORD ──────────────────────────────────────────────────────────
 exports.forgotPassword = async (req, res) => {
